@@ -6,6 +6,8 @@
 # https://docs.scrapy.org/en/latest/topics/spider-middleware.html
 
 from scrapy import signals
+from fake_useragent import UserAgent
+import requests
 
 
 class AnjukespiderSpiderMiddleware(object):
@@ -101,3 +103,31 @@ class AnjukespiderDownloaderMiddleware(object):
 
     def spider_opened(self, spider):
         spider.logger.info('Spider opened: %s' % spider.name)
+
+
+class UserAgentDownloaderMiddleware(object):
+    ua = UserAgent()
+
+    def process_request(self, request, spider):
+        user_agent = self.ua.random
+        request.headers['User-Agent'] = user_agent
+
+
+class IPProxyDownloaderMiddleware(object):
+    def get_proxy(self):
+        return requests.get("http://127.0.0.1:5010/get/").json()
+
+    def delete_proxy(self, proxy):
+        requests.get("http://127.0.0.1:5010/delete/?proxy={}".format(proxy))
+
+    def process_request(self, request, spider):
+        retry_count = 5  # 容错次数
+        proxy = self.get_proxy().get("proxy")  # 获取代理ip
+        while retry_count > 0:
+            try:
+                request.meta['proxy'] = proxy
+            except Exception:
+                retry_count -= 1
+        # 出错5次, 删除代理池中代理
+        self.delete_proxy(proxy)
+        return None  # 如果请求失败则返回None
