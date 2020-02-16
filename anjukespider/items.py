@@ -9,7 +9,29 @@ import scrapy
 
 
 class AnjukespiderItem(scrapy.Item):
-    # define the fields for your item here like:
+    # 数据库字段
     scene_name = scrapy.Field()
     web_site = scrapy.Field()
     creat_time = scrapy.Field()
+    link_3d = scrapy.Field()
+
+    # hotspots = scrapy.Field()
+
+    # img_count = scrapy.Field()
+    # hotspots_index = scrapy.Field()
+    # img_index = scrapy.Field()
+    # img_urls = scrapy.Field()
+
+
+class ImageItem(scrapy.Item):
+    # 存放url的下载地址
+    image_urls = scrapy.Field()
+    # 图片下载路径、url和校验码等信息（图片全部下载完成后将信息保存在images中）
+    images = scrapy.Field()
+    # 图片的本地保存地址
+    image_paths = scrapy.Field()
+
+    img_count = scrapy.Field()
+    hotspots_index = scrapy.Field()
+    img_index = scrapy.Field()
+    img_url = scrapy.Field()

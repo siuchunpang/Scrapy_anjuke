@@ -12,4 +12,5 @@ class Scene(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     scene_name = Column(String)
     web_site = Column(String)
+    link_3d = Column(String)
     creat_time = Column(DateTime)

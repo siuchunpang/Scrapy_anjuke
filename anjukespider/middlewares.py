@@ -9,7 +9,7 @@ from scrapy import signals
 from fake_useragent import UserAgent
 import requests
 
-
+"""
 class AnjukespiderSpiderMiddleware(object):
     # Not all methods need to be defined. If a method is not defined,
     # scrapy acts as if the spider middleware does not modify the
@@ -103,6 +103,7 @@ class AnjukespiderDownloaderMiddleware(object):
 
     def spider_opened(self, spider):
         spider.logger.info('Spider opened: %s' % spider.name)
+"""
 
 
 class UserAgentDownloaderMiddleware(object):
@@ -120,14 +121,28 @@ class IPProxyDownloaderMiddleware(object):
     def delete_proxy(self, proxy):
         requests.get("http://127.0.0.1:5010/delete/?proxy={}".format(proxy))
 
+    def identify_proxy(self):
+        proxy = self.get_proxy().get("proxy")
+        html = requests.get("http://httpbin.org/get", timeout=5, proxies={"http": "http://{}".format(proxy)})
+        html.encoding = 'utf-8'
+        html_text = html.text
+        if "违规网站" in html_text:
+            self.delete_proxy(proxy)
+        else:
+            return proxy
+
     def process_request(self, request, spider):
-        retry_count = 5  # 容错次数
-        proxy = self.get_proxy().get("proxy")  # 获取代理ip
-        while retry_count > 0:
-            try:
-                request.meta['proxy'] = proxy
-            except Exception:
-                retry_count -= 1
-        # 出错5次, 删除代理池中代理
-        self.delete_proxy(proxy)
-        return None  # 如果请求失败则返回None
+        proxy = self.identify_proxy()
+        request.meta['proxy'] = "http://{}".format(proxy)
+
+
+class FreeIPProxyDownloaderMiddleware(object):
+    def get_proxy(self):
+        proxy = requests.get("https://www.freeip.top/api/proxy_ip").json()
+        ip = proxy["data"].get("ip")
+        port = proxy["data"].get("port")
+        return ip + ":" + port
+
+    def identify_proxy(self, request, spider):
+        proxy = self.get_proxy()
+        request.meta['proxy'] = "http://{}".format(proxy)
