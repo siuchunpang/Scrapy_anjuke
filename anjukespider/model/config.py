@@ -3,7 +3,7 @@ from sqlalchemy.orm import sessionmaker
 import redis
 
 # 初始化数据库连接:
-engine = create_engine('mysql+pymysql://root:root@localhost:3306/spider?charset=utf8')
+engine = create_engine('mysql+pymysql://root:root@localhost:3306/spider?charset=UTF8MB4')
 
 # 创建DBSession类型:
 DBSession = sessionmaker(bind=engine)

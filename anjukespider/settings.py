@@ -66,16 +66,19 @@ DOWNLOADER_MIDDLEWARES = {
 
 # 使用ImagesPipeline
 # 设置图片下载路径
-IMAGES_STORE = 'F:\\Project\\Scrapy_anjuke\\anjukespider\\scene'
+# IMAGES_STORE = 'F:\\Project\\Scrapy_anjuke\\anjukespider\\scene'
+FILES_STORE = 'F:\\Project\\Scrapy_anjuke\\anjukespider\\scene'
 # 过期天数
 # IMAGES_EXPIRES = 90  # 90天内抓取的都不会被重抓
+FILES_EXPIRES = 30
 
 ITEM_PIPELINES = {
-    'scrapy.pipelines.images.ImagesPipeline': 1,
+    # 'scrapy.pipelines.files.FilesPipeline': 1,
+    # 'scrapy.pipelines.images.ImagesPipeline': 1,
     # 'anjukespider.pipelines.DuplicatesPipeline': 100,
-    'anjukespider.pipelines.DBPipeline': 110,
-    'anjukespider.pipelines.AnjukeImgDownloadPipeline': 120,
-    # 'anjukespider.pipelines.ImgDownloadPipeline': 120,
+    # 'anjukespider.pipelines.DBPipeline': 130,
+    'anjukespider.pipelines.ImgDownloadPipeline': 120,
+    'anjukespider.pipelines.JsonDownloadPipeline': 130,
 }
 
 # Enable and configure the AutoThrottle extension (disabled by default)

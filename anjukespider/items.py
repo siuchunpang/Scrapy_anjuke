@@ -23,15 +23,31 @@ class AnjukespiderItem(scrapy.Item):
     # img_urls = scrapy.Field()
 
 
-class ImageItem(scrapy.Item):
-    # 存放url的下载地址
-    image_urls = scrapy.Field()
-    # 图片下载路径、url和校验码等信息（图片全部下载完成后将信息保存在images中）
-    images = scrapy.Field()
-    # 图片的本地保存地址
-    image_paths = scrapy.Field()
+# class ImageItem(scrapy.Item):
+#     # 存放url的下载地址
+#     image_urls = scrapy.Field()
+#     # 图片下载路径、url和校验码等信息（图片全部下载完成后将信息保存在images中）
+#     images = scrapy.Field()
+#     # 图片的本地保存地址
+#     image_paths = scrapy.Field()
+#
+#     img_count = scrapy.Field()
+#     hotspots_index = scrapy.Field()
+#     img_index = scrapy.Field()
+#     img_url = scrapy.Field()
 
-    img_count = scrapy.Field()
+
+class FileItem(scrapy.Item):
+    file_json = scrapy.Field()
+    file_name = scrapy.Field()
+    # 存放url的下载地址
+    file_urls = scrapy.Field()
+    # 图片下载路径、url和校验码等信息（图片全部下载完成后将信息保存在images中）
+    files = scrapy.Field()
+    # 图片的本地保存地址
+    file_paths = scrapy.Field()
+
+    file_count = scrapy.Field()
     hotspots_index = scrapy.Field()
-    img_index = scrapy.Field()
-    img_url = scrapy.Field()
+    file_index = scrapy.Field()
+    file_url = scrapy.Field()
