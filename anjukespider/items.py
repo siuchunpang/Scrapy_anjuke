@@ -15,14 +15,6 @@ class AnjukespiderItem(scrapy.Item):
     creat_time = scrapy.Field()
     link_3d = scrapy.Field()
 
-    # hotspots = scrapy.Field()
-
-    # img_count = scrapy.Field()
-    # hotspots_index = scrapy.Field()
-    # img_index = scrapy.Field()
-    # img_urls = scrapy.Field()
-
-
 # class ImageItem(scrapy.Item):
 #     # 存放url的下载地址
 #     image_urls = scrapy.Field()

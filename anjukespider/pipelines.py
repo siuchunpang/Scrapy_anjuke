@@ -22,50 +22,6 @@ class DuplicatesPipeline(object):
             return item
 
 
-# 下载图片（自定义）
-# class ImgDownloadPipeline(object):
-#     def __init__(self):
-#         self.ua = UserAgent()
-
-    # def get_html(self, url):
-    #     USER_AGENT = self.ua.random
-    #     headers = {
-    #         "User-Agent": USER_AGENT,
-    #         "Connection": "keep-alive",
-    #         "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8",
-    #         "Accept-Language": "zh-CN,zh;q=0.8"}
-    #     resp = requests.get(url, headers=headers)
-    #     html = resp.content
-    #     return html
-
-    # def process_item(self, item, spider):
-    #     hotspots = item["hotspots"]
-    #     print(hotspots)
-    #     for hotspots_index, hotspot in enumerate(hotspots):
-    #         img_urls = hotspot['TileImagesPath']
-    #         scene_name = item["scene_name"]
-    #         scene_path = "F:\\Project\\Scrapy_anjuke\\anjukespider\\scene\\"
-    #         # img_count = item["img_count"]
-    #         # 创建场景文件夹
-    #         if not os.path.exists(scene_path + scene_name):
-    #             print('创建文件夹:%s' % scene_name)
-    #             os.mkdir(scene_path + scene_name)
-    #             # print("开始解析图片%d..." % img_count)
-    #             # img_count += 1
-    #             # 创建热点文件夹
-    #             if not os.path.exists(scene_path + "%s\\hotspot_%s" % (scene_name, hotspots_index)):
-    #                 # print('创建文件夹:hotspot_%s' % hotspots_index)
-    #                 os.mkdir(scene_path + "%s\\hotspot_%s" % (scene_name, hotspots_index))
-    #
-    #                 for img_links_index, img_link in enumerate(img_urls):
-    #                     img_link_name = img_link[24:56]
-    #                     # print("图片名称:%s_%d.jpg" % (img_link_name, img_links_index))
-    #                     html = self.get_html(img_link)
-    #                     with open(scene_path + "hotspot_%s\\%s_%d.jpg" % (hotspots_index, img_link_name, img_links_index),
-    #                               'wb') as file:
-    #                         file.write(html)
-
-
 # # 下载图片（自带）
 # class AnjukeImgDownloadPipeline(ImagesPipeline):
 #     def file_path(self, request, response=None, info=None):
@@ -99,26 +55,26 @@ class ImgDownloadPipeline(FilesPipeline):
         return '%s/hotspot_%s/%s.jpg' % (item["file_name"], item["hotspots_index"], file_link_name)
 
     def get_media_requests(self, item, info):
-        if isinstance(item, FileItem):
-            for file_url in item['file_urls']:
-                yield Request(url=file_url, meta={'item': item})
+        # if isinstance(item, FileItem):
+        for file_url in item['file_urls']:
+            yield Request(url=file_url, meta={'item': item})
 
     def item_completed(self, results, item, info):
-        if isinstance(item, FileItem):
-            file_paths = [x['path'] for ok, x in results if ok]
-            print("file_paths：", file_paths)
-            if not file_paths:
-                raise DropItem("Item contains no images")
-            item['file_paths'] = file_paths
-            return item
+        # if isinstance(item, FileItem):
+        file_paths = [x['path'] for ok, x in results if ok]
+        print("file_paths：", file_paths)
+        if not file_paths:
+            raise DropItem("Item contains no images")
+        item['file_paths'] = file_paths
+        return item
 
 
-# 数据去重
+# 下载Json文件
 class JsonDownloadPipeline(object):
     def process_item(self, item, spider):
-        with open("F:\\Project\\Spider\\AnjukeSpider\\scene\\%s\\scene.json" % item["file_name"], 'w') as file:
+        # if isinstance(item, FileItem):
+        with open("F:\\Project\\Scrapy_anjuke\\anjukespider\\scene\\%s\\scene.json" % item["file_name"], 'w') as file:
             json.dump(item["file_json"], file)
-
 
 
 # 数据库操作

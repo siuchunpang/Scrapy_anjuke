@@ -8,7 +8,7 @@ BOT_NAME = 'anjukespider'
 SPIDER_MODULES = ['anjukespider.spiders']
 NEWSPIDER_MODULE = 'anjukespider.spiders'
 
-# LOG_LEVEL = 'ERROR'
+LOG_LEVEL = 'ERROR'
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
 USER_AGENT = ua.random
@@ -76,8 +76,8 @@ ITEM_PIPELINES = {
     # 'scrapy.pipelines.files.FilesPipeline': 1,
     # 'scrapy.pipelines.images.ImagesPipeline': 1,
     # 'anjukespider.pipelines.DuplicatesPipeline': 100,
-    # 'anjukespider.pipelines.DBPipeline': 130,
-    'anjukespider.pipelines.ImgDownloadPipeline': 120,
+    # 'anjukespider.pipelines.DBPipeline': 1,
+    'anjukespider.pipelines.ImgDownloadPipeline': 1,
     'anjukespider.pipelines.JsonDownloadPipeline': 130,
 }
 
