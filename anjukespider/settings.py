@@ -8,7 +8,7 @@ BOT_NAME = 'anjukespider'
 SPIDER_MODULES = ['anjukespider.spiders']
 NEWSPIDER_MODULE = 'anjukespider.spiders'
 
-LOG_LEVEL = 'ERROR'
+# LOG_LEVEL = 'ERROR'
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
 USER_AGENT = ua.random
@@ -50,9 +50,9 @@ DEFAULT_REQUEST_HEADERS = {
 # See https://docs.scrapy.org/en/latest/topics/downloader-middleware.html
 DOWNLOADER_MIDDLEWARES = {
     # 'anjukespider.middlewares.AnjukespiderDownloaderMiddleware': 543,
-    'anjukespider.middlewares.UserAgentDownloaderMiddleware': 344,
+    'anjukespider.middlewares.UserAgentDownloaderMiddleware': 200,
     # 'anjukespider.middlewares.IPProxyDownloaderMiddleware': 343,
-    'anjukespider.middlewares.FreeIPProxyDownloaderMiddleware': 342,
+    # 'anjukespider.middlewares.FreeIPProxyDownloaderMiddleware': 342,
 }
 
 # Enable or disable extensions
@@ -76,9 +76,9 @@ ITEM_PIPELINES = {
     # 'scrapy.pipelines.files.FilesPipeline': 1,
     # 'scrapy.pipelines.images.ImagesPipeline': 1,
     # 'anjukespider.pipelines.DuplicatesPipeline': 100,
-    # 'anjukespider.pipelines.DBPipeline': 1,
-    'anjukespider.pipelines.ImgDownloadPipeline': 1,
-    'anjukespider.pipelines.JsonDownloadPipeline': 130,
+    'anjukespider.pipelines.DBPipeline': 130,
+    'anjukespider.pipelines.ImgDownloadPipeline': 110,
+    'anjukespider.pipelines.JsonDownloadPipeline': 120,
 }
 
 # Enable and configure the AutoThrottle extension (disabled by default)

@@ -4,10 +4,11 @@
 #
 # See documentation in:
 # https://docs.scrapy.org/en/latest/topics/spider-middleware.html
-
+import time
+import requests
 from scrapy import signals
 from fake_useragent import UserAgent
-import requests
+from selenium import webdriver
 
 """
 class AnjukespiderSpiderMiddleware(object):
@@ -107,13 +108,37 @@ class AnjukespiderDownloaderMiddleware(object):
 
 
 class UserAgentDownloaderMiddleware(object):
-    ua = UserAgent()
+    url = ""
 
     def process_request(self, request, spider):
-        user_agent = self.ua.random
+        ua = UserAgent()
+        user_agent = ua.random
         request.headers['User-Agent'] = user_agent
+        self.url = request.url
+        # print("User-agent：", user_agent)
+
+    def process_response(self, request, response, spider):
+        if ".jpg" not in request.url:
+            error_element = response.xpath('/html/head/title').get()
+            error_name = "访问验证-安居客"
+            if error_name in error_element:
+                print("反爬机制已阻拦，需要人工操作")
+                driver = webdriver.Chrome()
+                driver.get(self.url)
+                driver.maximize_window()
+                time.sleep(10)
+                driver.close()
+                print("解除反爬机制")
+                # with open("error.txt", "w", encoding='utf-8') as file:
+                #     file.write(response.text)
+                return request
+            else:
+                return response
+        else:
+            return response
 
 
+'''
 class IPProxyDownloaderMiddleware(object):
     def get_proxy(self):
         return requests.get("http://127.0.0.1:5010/get/").json()
@@ -143,6 +168,8 @@ class FreeIPProxyDownloaderMiddleware(object):
         port = proxy["data"].get("port")
         return ip + ":" + port
 
-    def identify_proxy(self, request, spider):
+    def process_request(self, request, spider):
         proxy = self.get_proxy()
+        print("代理IP为：", proxy)
         request.meta['proxy'] = "http://{}".format(proxy)
+'''
