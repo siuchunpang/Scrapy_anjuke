@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import datetime
 from fake_useragent import UserAgent
 
 ua = UserAgent()
@@ -8,7 +9,9 @@ BOT_NAME = 'anjukespider'
 SPIDER_MODULES = ['anjukespider.spiders']
 NEWSPIDER_MODULE = 'anjukespider.spiders'
 
-# LOG_LEVEL = 'ERROR'
+now = datetime.datetime.now()
+LOG_LEVEL = 'INFO'
+LOG_FILE = 'log/scrapy_{}_{}_{}.log'.format(now.year, now.month, now.day)
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
 USER_AGENT = ua.random
@@ -67,7 +70,7 @@ DOWNLOADER_MIDDLEWARES = {
 # 使用ImagesPipeline
 # 设置图片下载路径
 # IMAGES_STORE = 'F:\\Project\\Scrapy_anjuke\\anjukespider\\scene'
-FILES_STORE = 'F:\\Project\\Scrapy_anjuke\\anjukespider\\scene'
+FILES_STORE = 'F:\\Project\\Scrapy_anjuke\\anjukespider\\scene\\'
 # 过期天数
 # IMAGES_EXPIRES = 90  # 90天内抓取的都不会被重抓
 FILES_EXPIRES = 30
@@ -83,7 +86,7 @@ ITEM_PIPELINES = {
 
 # Enable and configure the AutoThrottle extension (disabled by default)
 # See https://docs.scrapy.org/en/latest/topics/autothrottle.html
-# AUTOTHROTTLE_ENABLED = True
+AUTOTHROTTLE_ENABLED = True
 # The initial download delay
 # AUTOTHROTTLE_START_DELAY = 5
 # The maximum download delay to be set in case of high latencies

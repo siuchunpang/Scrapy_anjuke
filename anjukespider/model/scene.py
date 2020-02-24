@@ -14,3 +14,4 @@ class Scene(Base):
     web_site = Column(String)
     link_3d = Column(String)
     creat_time = Column(DateTime)
+    shoot_count = Column(Integer)

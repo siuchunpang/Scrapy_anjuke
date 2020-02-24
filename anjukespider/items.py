@@ -12,8 +12,9 @@ class AnjukespiderItem(scrapy.Item):
     # 数据库字段
     scene_name = scrapy.Field()
     web_site = scrapy.Field()
-    creat_time = scrapy.Field()
     link_3d = scrapy.Field()
+    shoot_count = scrapy.Field()
+    creat_time = scrapy.Field()
 
 
 class FileItem(scrapy.Item):
@@ -26,7 +27,4 @@ class FileItem(scrapy.Item):
     # 图片的本地保存地址
     file_paths = scrapy.Field()
 
-    file_count = scrapy.Field()
     hotspots_index = scrapy.Field()
-    file_index = scrapy.Field()
-    file_url = scrapy.Field()

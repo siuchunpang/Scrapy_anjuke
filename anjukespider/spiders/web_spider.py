@@ -2,6 +2,7 @@ import json
 import scrapy
 import datetime
 import re
+import logging
 from anjukespider.items import AnjukespiderItem
 from anjukespider.items import FileItem
 
@@ -20,8 +21,10 @@ class WebsiteSpider(scrapy.Spider):
 
     def parse(self, response):
         try:
+            # logging.info("第%d次爬虫" % self.spider_count)
             print("第%d次爬虫" % self.spider_count)
             link_list = response.css("a.houseListTitle")
+            # logging.info("开始解析网站...")
             print("开始解析网站...")
             for link in link_list:
                 anjuke_item = AnjukespiderItem()
@@ -30,17 +33,20 @@ class WebsiteSpider(scrapy.Spider):
                 anjuke_item["scene_name"] = scene_name
                 anjuke_item["web_site"] = link.css("::attr(href)").get()
                 anjuke_item["creat_time"] = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-                yield scrapy.Request(anjuke_item['web_site'], meta={'anjuke_item': anjuke_item}, callback=self.parse_3d)
-                # break
+                yield scrapy.Request(anjuke_item['web_site'], meta={'anjuke_item': anjuke_item}, callback=self.parse_3d, priority=10)
+                break
 
-            print("解析网站完成！")
-            print("爬虫次数：", self.spider_count)
-            self.spider_count += 1
+            # logging.info("解析网站完成！")
+            # logging.info("爬虫次数：", self.spider_count)
+            # print("解析网站完成！")
+            # print("爬虫次数：", self.spider_count)
+            # self.spider_count += 1
 
-            next_page = response.css('a.aNxt::attr(href)').get()
-            if next_page is not None:
-                yield scrapy.Request(next_page, callback=self.parse)
+            # next_page = response.css('a.aNxt::attr(href)').get()
+            # if next_page is not None:
+            #     yield scrapy.Request(next_page, callback=self.parse)
         except Exception as e:
+            # logging.error("parse_error：", e)
             print("parse_error：", e)
 
     def parse_3d(self, response):
@@ -50,13 +56,14 @@ class WebsiteSpider(scrapy.Spider):
             if link_3d is not None:
                 # item["img_count"] += 1
                 anjuke_item["link_3d"] = link_3d
-                yield anjuke_item
-                yield scrapy.Request(link_3d, meta={'anjuke_item': anjuke_item}, callback=self.parse_img)
+                yield scrapy.Request(link_3d, meta={'anjuke_item': anjuke_item}, callback=self.parse_img, priority=1)
             else:
+                # logging.warning("该房间没有3D场景")
                 print("该房间没有3D场景")
                 anjuke_item["link_3d"] = ""
                 yield anjuke_item
         except Exception as e:
+            # logging.error("parse_3d_error：", e)
             print("parse_3d_error：", e)
 
     def parse_img(self, response):
@@ -79,9 +86,13 @@ class WebsiteSpider(scrapy.Spider):
                     file_item["file_urls"] = file_urls
                     yield file_item
 
-            # print("解析图片完成！")
-            # shoot_count = len(hotspots)
-            # yield shoot_count
+                # print("解析图片完成！")
+                shoot_count = len(hotspots)
+                # logging.info("shoot_count：", shoot_count)
+                print("shoot_count：", shoot_count)
+                anjuke_item["shoot_count"] = shoot_count
+                yield anjuke_item
         except Exception as e:
+            # logging.error("parse_img_error：", e)
             print("parse_img_error：", e)
 
