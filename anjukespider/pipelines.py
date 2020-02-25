@@ -3,7 +3,7 @@ import os
 import logging
 
 from scrapy.pipelines.files import FilesPipeline
-from anjukespider.model.scene import Scene
+from anjukespider.model.scene import Scene, SceneImg
 from anjukespider.model.config import DBSession
 from anjukespider.model.config import Redis
 from anjukespider.items import AnjukespiderItem
@@ -72,25 +72,35 @@ class DBPipeline(object):
         self.session = DBSession()
 
     def process_item(self, item, spider):
-        if isinstance(item, AnjukespiderItem):
-            try:
+        try:
+            # self.session.begin_nested()
+            if isinstance(item, AnjukespiderItem):
                 # logging.info("录入数据库")
-                print("录入数据库")
-                sql = Scene(
+                print("录入数据库scene")
+                sql_scene = Scene(
+                    scene_unique_name=item["scene_unique_name"],
                     scene_name=item["scene_name"],
                     web_site=item["web_site"],
                     link_3d=item["link_3d"],
-                    shoot_count=item["shoot_count"],
+                    # shoot_count=item["shoot_count"],
                     creat_time=item["creat_time"]
                 )
-                self.session.add(sql)
+                self.session.add(sql_scene)
+            elif isinstance(item, FileItem):
+                # logging.info("录入数据库")
+                print("录入数据库scene_img")
+                for img_url in item['file_urls']:
+                    sql_img = SceneImg(
+                        file_unique_name=item["file_unique_name"],
+                        img_url=img_url,
+                    )
+                    self.session.add(sql_img)
                 self.session.commit()
-            except Exception as e:
-                self.session.rollback()
-                # logging.error("DBPipeline_error：", e)
-                print("DBPipeline_error：", e)
-        else:
-            return item
+        except Exception as e:
+            self.session.rollback()
+            # logging.error("DBPipeline_error：", e)
+            print("DBPipeline_error：", e)
+        return item
 
     def close_spider(self, spider):
         self.session.close()

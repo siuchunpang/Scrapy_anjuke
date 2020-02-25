@@ -29,9 +29,11 @@ class WebsiteSpider(scrapy.Spider):
             for link in link_list:
                 anjuke_item = AnjukespiderItem()
                 scene_name = self.validate_title(link.css("::attr(title)").get())
-                # item["img_count"] = 0
+                href = link.css("::attr(href)").get()
+                scene_unique_name = href.split("?")[0]
+                anjuke_item["scene_unique_name"] = scene_unique_name[-11:]
                 anjuke_item["scene_name"] = scene_name
-                anjuke_item["web_site"] = link.css("::attr(href)").get()
+                anjuke_item["web_site"] = href
                 anjuke_item["creat_time"] = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
                 yield scrapy.Request(anjuke_item['web_site'], meta={'anjuke_item': anjuke_item}, callback=self.parse_3d, priority=10)
                 break
@@ -54,7 +56,6 @@ class WebsiteSpider(scrapy.Spider):
             link_3d = response.xpath('//*[@id="qj_pic_wrap"]/div/iframe/@src').get()
             anjuke_item = response.meta['anjuke_item']
             if link_3d is not None:
-                # item["img_count"] += 1
                 anjuke_item["link_3d"] = link_3d
                 yield scrapy.Request(link_3d, meta={'anjuke_item': anjuke_item}, callback=self.parse_img, priority=1)
             else:
@@ -79,6 +80,7 @@ class WebsiteSpider(scrapy.Spider):
 
                 for hotspots_index, hotspot in enumerate(hotspots):
                     file_item = FileItem()
+                    file_item["file_unique_name"] = anjuke_item["scene_unique_name"]
                     file_item["file_name"] = anjuke_item["scene_name"]
                     file_item["file_json"] = data
                     file_urls = hotspot['TileImagesPath']
@@ -90,7 +92,7 @@ class WebsiteSpider(scrapy.Spider):
                 shoot_count = len(hotspots)
                 # logging.info("shoot_count：", shoot_count)
                 print("shoot_count：", shoot_count)
-                anjuke_item["shoot_count"] = shoot_count
+                # anjuke_item["shoot_count"] = shoot_count
                 yield anjuke_item
         except Exception as e:
             # logging.error("parse_img_error：", e)

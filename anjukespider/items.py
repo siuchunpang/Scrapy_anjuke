@@ -10,6 +10,7 @@ import scrapy
 
 class AnjukespiderItem(scrapy.Item):
     # 数据库字段
+    scene_unique_name = scrapy.Field()
     scene_name = scrapy.Field()
     web_site = scrapy.Field()
     link_3d = scrapy.Field()
@@ -19,6 +20,7 @@ class AnjukespiderItem(scrapy.Item):
 
 class FileItem(scrapy.Item):
     file_json = scrapy.Field()
+    file_unique_name = scrapy.Field()
     file_name = scrapy.Field()
     # 存放url的下载地址
     file_urls = scrapy.Field()
