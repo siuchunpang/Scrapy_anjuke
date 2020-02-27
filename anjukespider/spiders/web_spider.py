@@ -92,7 +92,7 @@ class WebsiteSpider(scrapy.Spider):
                 shoot_count = len(hotspots)
                 # logging.info("shoot_count：", shoot_count)
                 print("shoot_count：", shoot_count)
-                # anjuke_item["shoot_count"] = shoot_count
+                anjuke_item["shoot_count"] = shoot_count
                 yield anjuke_item
         except Exception as e:
             # logging.error("parse_img_error：", e)

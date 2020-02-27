@@ -82,7 +82,7 @@ class DBPipeline(object):
                     scene_name=item["scene_name"],
                     web_site=item["web_site"],
                     link_3d=item["link_3d"],
-                    # shoot_count=item["shoot_count"],
+                    shoot_count=item["shoot_count"],
                     creat_time=item["creat_time"]
                 )
                 self.session.add(sql_scene)
@@ -91,7 +91,7 @@ class DBPipeline(object):
                 print("录入数据库scene_img")
                 for img_url in item['file_urls']:
                     sql_img = SceneImg(
-                        file_unique_name=item["file_unique_name"],
+                        scene_id=sql_scene.id,
                         img_url=img_url,
                     )
                     self.session.add(sql_img)
