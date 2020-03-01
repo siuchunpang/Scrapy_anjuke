@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import datetime
+import random
 from fake_useragent import UserAgent
 
 ua = UserAgent()
@@ -25,13 +26,13 @@ ROBOTSTXT_OBEY = False
 # Configure a delay for requests for the same website (default: 0)
 # See https://docs.scrapy.org/en/latest/topics/settings.html#download-delay
 # See also autothrottle settings and docs
-# DOWNLOAD_DELAY = 3
+# DOWNLOAD_DELAY = random.random()
 # The download delay setting will honor only one of:
 # CONCURRENT_REQUESTS_PER_DOMAIN = 16
 # CONCURRENT_REQUESTS_PER_IP = 16
 
 # Disable cookies (enabled by default)
-# COOKIES_ENABLED = False
+COOKIES_ENABLED = False
 
 # Disable Telnet Console (enabled by default)
 # TELNETCONSOLE_ENABLED = False
@@ -39,7 +40,7 @@ ROBOTSTXT_OBEY = False
 # Override the default request headers:
 DEFAULT_REQUEST_HEADERS = {
     'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-    'Accept-Language': 'en',
+    'Accept-Language': 'zh-CN,zh;q=0.9',
 }
 
 # Enable or disable spider middlewares
@@ -54,8 +55,7 @@ DEFAULT_REQUEST_HEADERS = {
 DOWNLOADER_MIDDLEWARES = {
     # 'anjukespider.middlewares.AnjukespiderDownloaderMiddleware': 543,
     'anjukespider.middlewares.UserAgentDownloaderMiddleware': 200,
-    # 'anjukespider.middlewares.IPProxyDownloaderMiddleware': 343,
-    # 'anjukespider.middlewares.FreeIPProxyDownloaderMiddleware': 342,
+    # 'anjukespider.middlewares.RandomDelayMiddleware': 100,
 }
 
 # Enable or disable extensions
@@ -78,10 +78,11 @@ FILES_EXPIRES = 30
 ITEM_PIPELINES = {
     # 'scrapy.pipelines.files.FilesPipeline': 1,
     # 'scrapy.pipelines.images.ImagesPipeline': 1,
-    # 'anjukespider.pipelines.DuplicatesPipeline': 100,
-    'anjukespider.pipelines.DBPipeline': 130,
+    'anjukespider.pipelines.DuplicatesPipeline': 100,
+
     'anjukespider.pipelines.ImgDownloadPipeline': 110,
     'anjukespider.pipelines.JsonDownloadPipeline': 120,
+    'anjukespider.pipelines.DBPipeline': 130,
 }
 
 # Enable and configure the AutoThrottle extension (disabled by default)

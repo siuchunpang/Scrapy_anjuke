@@ -4,7 +4,6 @@ import datetime
 import re
 import logging
 from anjukespider.items import AnjukespiderItem
-from anjukespider.items import FileItem
 
 
 class WebsiteSpider(scrapy.Spider):
@@ -12,7 +11,6 @@ class WebsiteSpider(scrapy.Spider):
     name = 'anjukespider'
 
     start_urls = ['https://beijing.anjuke.com/sale/v3/']
-    # start_urls = ["http://httpbin.org/get"]
 
     def validate_title(self, title):
         rstr = r"[\/\\\:\*\?\"\<\>\|]"  # '/ \ : * ? " < > |'
@@ -22,10 +20,9 @@ class WebsiteSpider(scrapy.Spider):
     def parse(self, response):
         try:
             # logging.info("第%d次爬虫" % self.spider_count)
-            print("第%d次爬虫" % self.spider_count)
+            print("爬取第%d页" % self.spider_count)
             link_list = response.css("a.houseListTitle")
             # logging.info("开始解析网站...")
-            print("开始解析网站...")
             for link in link_list:
                 anjuke_item = AnjukespiderItem()
                 scene_name = self.validate_title(link.css("::attr(title)").get())
@@ -35,18 +32,16 @@ class WebsiteSpider(scrapy.Spider):
                 anjuke_item["scene_name"] = scene_name
                 anjuke_item["web_site"] = href
                 anjuke_item["creat_time"] = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-                yield scrapy.Request(anjuke_item['web_site'], meta={'anjuke_item': anjuke_item}, callback=self.parse_3d, priority=10)
-                break
+                print("开始解析%s场景..." % scene_unique_name[-11:])
+                yield scrapy.Request(anjuke_item['web_site'], meta={'anjuke_item': anjuke_item}, callback=self.parse_3d)
+                # break
 
-            # logging.info("解析网站完成！")
-            # logging.info("爬虫次数：", self.spider_count)
-            # print("解析网站完成！")
-            # print("爬虫次数：", self.spider_count)
-            # self.spider_count += 1
-
-            # next_page = response.css('a.aNxt::attr(href)').get()
-            # if next_page is not None:
-            #     yield scrapy.Request(next_page, callback=self.parse)
+            next_page = response.css('a.aNxt::attr(href)').get()
+            if next_page is not None and self.spider_count < 5:
+                self.spider_count += 1
+                yield scrapy.Request(next_page, callback=self.parse)
+            else:
+                print("共爬取%d页" % self.spider_count)
         except Exception as e:
             # logging.error("parse_error：", e)
             print("parse_error：", e)
@@ -57,7 +52,7 @@ class WebsiteSpider(scrapy.Spider):
             anjuke_item = response.meta['anjuke_item']
             if link_3d is not None:
                 anjuke_item["link_3d"] = link_3d
-                yield scrapy.Request(link_3d, meta={'anjuke_item': anjuke_item}, callback=self.parse_img, priority=1)
+                yield scrapy.Request(link_3d, meta={'anjuke_item': anjuke_item}, callback=self.parse_img)
             else:
                 # logging.warning("该房间没有3D场景")
                 print("该房间没有3D场景")
@@ -76,24 +71,11 @@ class WebsiteSpider(scrapy.Spider):
             if data_3d_list is not []:
                 data_3d = data_3d_list[0].replace("\\", "")
                 data = json.loads(data_3d, strict=False)
-                hotspots = data['HotSpots']
-
-                for hotspots_index, hotspot in enumerate(hotspots):
-                    file_item = FileItem()
-                    file_item["file_unique_name"] = anjuke_item["scene_unique_name"]
-                    file_item["file_name"] = anjuke_item["scene_name"]
-                    file_item["file_json"] = data
-                    file_urls = hotspot['TileImagesPath']
-                    file_item["hotspots_index"] = hotspots_index
-                    file_item["file_urls"] = file_urls
-                    yield file_item
-
-                # print("解析图片完成！")
-                shoot_count = len(hotspots)
-                # logging.info("shoot_count：", shoot_count)
-                print("shoot_count：", shoot_count)
-                anjuke_item["shoot_count"] = shoot_count
+                anjuke_item["data"] = data
+                anjuke_item["hotspots"] = data['HotSpots']
+                anjuke_item["shoot_count"] = len(anjuke_item["hotspots"])
                 yield anjuke_item
+
         except Exception as e:
             # logging.error("parse_img_error：", e)
             print("parse_img_error：", e)

@@ -9,24 +9,21 @@ import scrapy
 
 
 class AnjukespiderItem(scrapy.Item):
-    # 数据库字段
+    # scene数据库字段
     scene_unique_name = scrapy.Field()
     scene_name = scrapy.Field()
     web_site = scrapy.Field()
     link_3d = scrapy.Field()
+    data = scrapy.Field()
+
     shoot_count = scrapy.Field()
     creat_time = scrapy.Field()
 
-
-class FileItem(scrapy.Item):
-    file_json = scrapy.Field()
-    file_unique_name = scrapy.Field()
-    file_name = scrapy.Field()
-    # 存放url的下载地址
+    # scene_img数据库字段
+    # FilesPipeline必须字段
     file_urls = scrapy.Field()
-    # 图片下载路径、url和校验码等信息（图片全部下载完成后将信息保存在images中）
     files = scrapy.Field()
-    # 图片的本地保存地址
     file_paths = scrapy.Field()
 
-    hotspots_index = scrapy.Field()
+    hotspots = scrapy.Field()
+    results = scrapy.Field()

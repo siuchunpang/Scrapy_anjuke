@@ -1,6 +1,5 @@
-from sqlalchemy import Column, String, DateTime, Integer, ForeignKey
+from sqlalchemy import Column, String, DateTime, Integer, ForeignKey, Boolean
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import relationship, backref
 
 # 创建对象的基类:
 Base = declarative_base()
@@ -24,7 +23,8 @@ class SceneImg(Base):
 
     # 表的结构:
     id = Column(Integer, primary_key=True, autoincrement=True)
-    scene_id = Column(String, ForeignKey("scene.id"))
-    scene = relationship("scene", backref="scene_img")
+    scene_id = Column(Integer, ForeignKey("scene.id"))
     img_url = Column(String)
+    is_downloaded = Column(String)
+    failed_download_reason = Column(String)
 
