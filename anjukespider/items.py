@@ -27,3 +27,5 @@ class AnjukespiderItem(scrapy.Item):
 
     hotspots = scrapy.Field()
     results = scrapy.Field()
+
+    error = scrapy.Field()

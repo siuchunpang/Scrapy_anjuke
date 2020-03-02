@@ -10,12 +10,16 @@ from anjukespider.settings import FILES_STORE
 from scrapy.exceptions import DropItem
 from scrapy import Request
 
+Duplicate_item = 0
+
 
 # 数据去重
 class DuplicatesPipeline(object):
     def process_item(self, item, spider):
         if Redis.hexists("duplicate", item['scene_unique_name']):
-            print("Duplicate item found: %s" % item)
+            global Duplicate_item
+            Duplicate_item += 1
+            print("重复数据:%d" % Duplicate_item)
             raise DropItem("Duplicate item found: %s" % item)
         else:
             Redis.hset("duplicate", item['scene_unique_name'], 1)
@@ -56,10 +60,14 @@ class JsonDownloadPipeline(object):
         if item["link_3d"] != "":
             scene_path = FILES_STORE + item["scene_unique_name"]
             if not os.path.exists(scene_path + "\\scene.json"):
-                logging.info("下载Json文件")
+                # logging.info("下载Json文件")
                 print("下载Json文件")
-                with open(scene_path + "\\scene.json", 'w') as file:
-                    json.dump(item["data"], file)
+                try:
+                    item["error"] = None
+                    with open(scene_path + "\\scene.json", 'w') as file:
+                        json.dump(item["data"], file)
+                except FileNotFoundError as e:
+                    item["error"] = e
         return item
 
 
@@ -70,7 +78,7 @@ class DBPipeline(object):
 
     def process_item(self, item, spider):
         try:
-            if item["link_3d"] != "":
+            if item["link_3d"] != "" and item["error"] is None:
                 # logging.info("录入数据库")
                 print("录入scene表")
                 sql_scene = Scene(
@@ -86,22 +94,16 @@ class DBPipeline(object):
 
                 # logging.info("录入数据库")
                 print("录入scene_img表")
-                img_urls = []
-                for hotspot in item["hotspots"]:
+                for i, hotspot in enumerate(item["hotspots"]):
                     file_urls = hotspot['TileImagesPath']
-                    for img_url in file_urls:
-                        img_urls.append(img_url)
+                    for j, img_url in enumerate(file_urls):
                         sql_img = SceneImg(
                             scene_id=sql_scene.id,
                             img_url=img_url,
+                            is_downloaded=item["results"][i*6+j][0],
+                            failed_download_reason=str(item["results"][i*6+j][1])
                         )
                         self.session.add(sql_img)
-                for i in range(len(img_urls)):
-                    self.session.query(SceneImg).filter(SceneImg.img_url == img_urls[i]).update({
-                        "is_downloaded": item["results"][i][0],
-                        "failed_download_reason": str(item["results"][i][1])
-                    })
-
                 self.session.commit()
             else:
                 print("录入scene表")
@@ -122,5 +124,6 @@ class DBPipeline(object):
         return item
 
     def close_spider(self, spider):
+        print("共爬取%d个场景" % spider.scene_count)
         self.session.close()
 

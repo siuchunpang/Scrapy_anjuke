@@ -8,6 +8,7 @@ from anjukespider.items import AnjukespiderItem
 
 class WebsiteSpider(scrapy.Spider):
     spider_count = 1
+    scene_count = 0
     name = 'anjukespider'
 
     start_urls = ['https://beijing.anjuke.com/sale/v3/']
@@ -19,10 +20,9 @@ class WebsiteSpider(scrapy.Spider):
 
     def parse(self, response):
         try:
-            # logging.info("第%d次爬虫" % self.spider_count)
+            logging.info("第%d次爬虫" % self.spider_count)
             print("爬取第%d页" % self.spider_count)
             link_list = response.css("a.houseListTitle")
-            # logging.info("开始解析网站...")
             for link in link_list:
                 anjuke_item = AnjukespiderItem()
                 scene_name = self.validate_title(link.css("::attr(title)").get())
@@ -32,16 +32,17 @@ class WebsiteSpider(scrapy.Spider):
                 anjuke_item["scene_name"] = scene_name
                 anjuke_item["web_site"] = href
                 anjuke_item["creat_time"] = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-                print("开始解析%s场景..." % scene_unique_name[-11:])
+                # print("开始解析%s场景..." % scene_unique_name[-11:])
+                self.scene_count += 1
                 yield scrapy.Request(anjuke_item['web_site'], meta={'anjuke_item': anjuke_item}, callback=self.parse_3d)
                 # break
 
             next_page = response.css('a.aNxt::attr(href)').get()
-            if next_page is not None and self.spider_count < 5:
+            if next_page is not None and self.spider_count < 3:
                 self.spider_count += 1
                 yield scrapy.Request(next_page, callback=self.parse)
             else:
-                print("共爬取%d页" % self.spider_count)
+                logging.info("共爬取%d页" % self.spider_count)
         except Exception as e:
             # logging.error("parse_error：", e)
             print("parse_error：", e)
