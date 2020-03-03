@@ -9,6 +9,7 @@ from anjukespider.items import AnjukespiderItem
 class WebsiteSpider(scrapy.Spider):
     spider_count = 1
     scene_count = 0
+    Duplicate_item = 0
     name = 'anjukespider'
 
     start_urls = ['https://beijing.anjuke.com/sale/v3/']

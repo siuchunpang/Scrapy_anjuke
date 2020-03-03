@@ -1,3 +1,4 @@
+import datetime
 import json
 import os
 import logging
@@ -10,16 +11,13 @@ from anjukespider.settings import FILES_STORE
 from scrapy.exceptions import DropItem
 from scrapy import Request
 
-Duplicate_item = 0
-
 
 # 数据去重
 class DuplicatesPipeline(object):
     def process_item(self, item, spider):
         if Redis.hexists("duplicate", item['scene_unique_name']):
-            global Duplicate_item
-            Duplicate_item += 1
-            print("重复数据:%d" % Duplicate_item)
+            spider.Duplicate_item += 1
+            print("重复数据:%d" % spider.Duplicate_item)
             raise DropItem("Duplicate item found: %s" % item)
         else:
             Redis.hset("duplicate", item['scene_unique_name'], 1)
@@ -63,7 +61,7 @@ class JsonDownloadPipeline(object):
                 # logging.info("下载Json文件")
                 print("下载Json文件")
                 try:
-                    item["error"] = None
+                    item["error"] = 1
                     with open(scene_path + "\\scene.json", 'w') as file:
                         json.dump(item["data"], file)
                 except FileNotFoundError as e:
@@ -74,11 +72,12 @@ class JsonDownloadPipeline(object):
 # 数据库操作
 class DBPipeline(object):
     def __init__(self):
+        self.start_time = datetime.datetime.now()
         self.session = DBSession()
 
     def process_item(self, item, spider):
         try:
-            if item["link_3d"] != "" and item["error"] is None:
+            if item["link_3d"] != "" and item["error"] == 1:
                 # logging.info("录入数据库")
                 print("录入scene表")
                 sql_scene = Scene(
@@ -124,6 +123,9 @@ class DBPipeline(object):
         return item
 
     def close_spider(self, spider):
+        end_time = datetime.datetime.now()
+        time = end_time - self.start_time
+        print("共耗时:%s" % str(time))
         print("共爬取%d个场景" % spider.scene_count)
         self.session.close()
 
